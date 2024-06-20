@@ -1,4 +1,4 @@
-
+import java.text.ParseException;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -12,9 +12,13 @@ import org.json.simple.parser.JSONParser;
 public class DataManager {
 
 	private final WebClient client;
-
+	private final Map<String, String> contributorNameC;
 	public DataManager(WebClient client) {
+		if (client == null) {
+			throw new IllegalArgumentException("WebClient can't be null");
+		}
 		this.client = client;
+		this.contributorNameC = new HashMap<>();
 	}
 
 	/**
@@ -23,13 +27,18 @@ public class DataManager {
 	 * @return an Organization object if successful; null if unsuccessful
 	 */
 	public Organization attemptLogin(String login, String password) {
-
+		if (login == null || password == null) {
+			throw new IllegalArgumentException("Login or password can't be null");
+		}
 		try {
 			Map<String, Object> map = new HashMap<>();
 			map.put("login", login);
 			map.put("password", password);
 			String response = client.makeRequest("/findOrgByLoginAndPassword", map);
 
+			if (response == null) {
+				throw new IllegalStateException("Response returned null");
+			}
 			JSONParser parser = new JSONParser();
 			JSONObject json = (JSONObject) parser.parse(response);
 			String status = (String)json.get("status");
@@ -72,12 +81,13 @@ public class DataManager {
 				}
 
 				return org;
+			} else {
+				throw new IllegalStateException("Login failed: " + json.get("error"));
 			}
-			else return null;
-		}
-		catch (Exception e) {
-			e.printStackTrace();
-			return null;
+		} catch (ParseException e) {
+			throw new IllegalStateException("Failed to parse JSON response", e);
+		} catch (Exception e) {
+			throw new IllegalStateException("Error in communicating with server", e);
 		}
 	}
 
@@ -87,36 +97,52 @@ public class DataManager {
 	 * @return the name of the contributor on success; null if no contributor is found
 	 */
 	public String getContributorName(String id) {
+		if (id == null) {
+			throw new IllegalStateException("Contributor ID is null");
+		}
 
+		if (contributorNameC.containsKey(id)) {
+			return contributorNameC.get(id);
+		}
 		try {
 
 			Map<String, Object> map = new HashMap<>();
 			map.put("_id", id);
 			String response = client.makeRequest("/findContributrNameById", map);
-
+			if (response == null) {
+				throw new IllegalStateException("Response returned null");
+			}
 			JSONParser parser = new JSONParser();
 			JSONObject json = (JSONObject) parser.parse(response);
 			String status = (String)json.get("status");
 
 			if (status.equals("success")) {
 				String name = (String)json.get("data");
+				contributorNameC.put(id, name);
 				return name;
+			} else {
+				return null;
 			}
-			else return null;
 
-
+		} catch (ParseException e) {
+			throw new IllegalStateException("Failed to parse JSON response", e);
+		} catch (Exception e) {
+			throw new IllegalStateException("Error in communicating with server", e);
 		}
-		catch (Exception e) {
-			return null;
-		}	
+			
 	}
+
+
+	
 
 	/**
 	 * This method creates a new fund in the database using the /createFund endpoint in the API
 	 * @return a new Fund object if successful; null if unsuccessful
 	 */
 	public Fund createFund(String orgId, String name, String description, long target) {
-
+		if (orgId == null || name == null || description == null) {
+			throw new IllegalArgumentException("Organization ID, name, and description are null");
+		}
 		try {
 
 			Map<String, Object> map = new HashMap<>();
@@ -125,7 +151,9 @@ public class DataManager {
 			map.put("description", description);
 			map.put("target", target);
 			String response = client.makeRequest("/createFund", map);
-
+			if (response == null) {
+				throw new IllegalStateException("Response returned null");
+			}
 			JSONParser parser = new JSONParser();
 			JSONObject json = (JSONObject) parser.parse(response);
 			String status = (String)json.get("status");
@@ -134,13 +162,14 @@ public class DataManager {
 				JSONObject fund = (JSONObject)json.get("data");
 				String fundId = (String)fund.get("_id");
 				return new Fund(fundId, name, description, target);
-			}
-			else return null;
+			} else {
+				return null;
+			} 
 
-		}
-		catch (Exception e) {
-			e.printStackTrace();
-			return null;
+		} catch (ParseException e) {
+			throw new IllegalStateException("Failed to parse JSON response", e);
+		} catch (Exception e) {
+			throw new IllegalStateException("Error in communicating with server", e);
 		}	
 	}
 
