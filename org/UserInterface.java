@@ -47,7 +47,7 @@ public class UserInterface {
             }
 
             try {
-                int option = Integer.parseInt(input);
+                int option = Integer.parseInt(answer);
                 if (option == 0) {
                     createFund();
                 } else if (option > 0 && option <= org.getFunds().size()) {

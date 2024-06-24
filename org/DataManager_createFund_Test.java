@@ -62,7 +62,7 @@ public class DataManager_createFund_Test {
 			
 			@Override
 			public String makeRequest(String resource, Map<String, Object> queryParams) {
-				throw new RuntimeErrorException("can't make request");
+				throw new RuntimeException("can't make request");
 
 			}
 			
