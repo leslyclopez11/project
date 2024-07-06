@@ -6,6 +6,7 @@ public class Organization {
 	private String id;
 	private String name;
 	private String description;
+	private String password;
 	
 	private List<Fund> funds;
 	
@@ -34,6 +35,14 @@ public class Organization {
 	
 	public void addFund(Fund fund) {
 		funds.add(fund);
+	}
+
+	public String getPassword() {
+		return this.password;
+	}
+
+	public void setPassword(String password) {
+		this.password = password;
 	}
 	
 
