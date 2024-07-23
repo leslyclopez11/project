@@ -28,8 +28,6 @@ public class DataManager {
 	 * @return an Organization object if successful; null if unsuccessful
 	 */
 	public Organization attemptLogin(String login, String password) {
-		//System.out.println("username: " + login);
-		//System.out.println("password: " + password);
 		if (login == null || password == null) {
 			throw new IllegalArgumentException("Login or password can't be null");
 		}
@@ -39,10 +37,7 @@ public class DataManager {
 			Map<String, Object> map = new HashMap<>();
 			map.put("login", login);
 			map.put("password", password);
-			//System.out.println("username: " + login);
-			//System.out.println("password: " + password);
 			String response = client.makeRequest("/findOrgByLoginAndPassword", map);
-			//System.out.println("response: " + response);
 			if (response == null) {
 				throw new IllegalStateException("Response returned null");
 			}
@@ -95,9 +90,9 @@ public class DataManager {
 				throw new IllegalStateException("Login failed: " + json.get("error"));
 			}
 		} catch (ParseException e) {
-			throw new IllegalStateException("Failed to parse JSON respons0: " + e);
+			throw new IllegalStateException("Failed to parse JSON respons");
 		} catch (Exception e) {
-			throw new IllegalStateException("Error in communicating with server: " +  e);
+			throw new IllegalStateException("Error in communicating with server");
 		}
 	}
 
@@ -108,7 +103,7 @@ public class DataManager {
 	 */
 	public String getContributorName(String id) {
 		if (id == null) {
-			throw new IllegalStateException("Contributor ID is null");
+			throw new IllegalStateException("Contributor ID can't be null");
 		}
 
 		if (contributorNameC.containsKey(id)) {
@@ -135,9 +130,9 @@ public class DataManager {
 			}
 
 		} catch (ParseException e) {
-			throw new IllegalStateException("Failed to parse JSON response: " + e);
+			throw new IllegalStateException("Failed to parse JSON response");
 		} catch (Exception e) {
-			throw new IllegalStateException("Error in communicating with server: " + e);
+			throw new IllegalStateException("Error in communicating with server");
 		}
 			
 	}
@@ -151,7 +146,7 @@ public class DataManager {
 	 */
 	public Fund createFund(String orgId, String name, String description, long target) {
 		if (orgId == null || name == null || description == null) {
-			throw new IllegalArgumentException("Organization ID, name, and description are null");
+			throw new IllegalArgumentException("Organization ID, name or description can't null");
 		}
 		try {
 
@@ -177,29 +172,20 @@ public class DataManager {
 			} 
 
 		} catch (ParseException e) {
-			throw new IllegalStateException("Failed to parse JSON response2: " + e);
+			throw new IllegalStateException("Failed to parse JSON response");
 		} catch (Exception e) {
-			throw new IllegalStateException("Error in communicating with server: " + e);
+			throw new IllegalStateException("Error in communicating with server");
 		}	
 	}
 
-	/*
-	 * Create org
+	/**
+	 * Creates a new organization using the /createOrganization endpoint in API
+	 * @return an Organization object if successful; null if unsuccessful
 	 */
 
 	public Organization createOrganization(String login, String password, String name, String description) {
-		if (login == null) {
-			throw new IllegalArgumentException("Login can't be null");
-		}
-		if (password == null) {
-			throw new IllegalArgumentException("Password can't be null");
-		}
-
-		if (name == null) {
-			throw new IllegalArgumentException("Name can't be null");
-		}
-		if (description == null) {
-			throw new IllegalArgumentException("Description can't be null");
+		if (login == null || password == null || name == null || description == null) {
+			throw new IllegalArgumentException("Login, password, name or description can't be null");
 		}
 
 		try {
@@ -224,15 +210,20 @@ public class DataManager {
 				throw new IllegalStateException("Status: " + status);
 			}
 		} catch (ParseException e) {
-			throw new IllegalStateException("Failed to parse JSON response2: " + e);
+			throw new IllegalStateException("Failed to parse JSON response");
 		} catch (Exception e) {
-			throw new IllegalStateException("Error in communicating with server: " + e);
+			throw new IllegalStateException("Error in communicating with server");
 		}	
 
 	}
+
+	/**
+	 * Cheacks usarname is available in MongoDB using the /sameUsername endpoint in API
+	 * @return true if username is available; false if unavailable
+	 */
 	public boolean UsernameAv(String login) {
 		if (login == null) {
-			throw new IllegalArgumentException("login can't be null");
+			throw new IllegalArgumentException("Login can't be null");
 		}
 
 		try {
@@ -254,26 +245,15 @@ public class DataManager {
 				throw new IllegalStateException("Status: " + status);
 			}
 		} catch (ParseException e) {
-			throw new IllegalStateException("Failed to parse JSON response2: " + e);
+			throw new IllegalStateException("Failed to parse JSON response");
 		} catch (Exception e) {
-			throw new IllegalStateException("Error in communicating with server: " + e);
+			throw new IllegalStateException("Error in communicating with server");
 		}	
 	}
 
 	public boolean changePassword(String orgId, String currentPassword, String newPassword) {
-    	
-    	// Throw exception
-        if (client == null) {
-            throw new IllegalStateException("Client is null!");
-        }
-        if (orgId == null) {
-            throw new IllegalArgumentException("ID is null!");
-        }
-        if (currentPassword == null) {
-            throw new IllegalArgumentException("Current password is null!");
-        }
-        if (newPassword == null) {
-            throw new IllegalArgumentException("New password is null!");
+        if (orgId == null || currentPassword == null || newPassword == null) {
+            throw new IllegalArgumentException("Organization ID, currentPassword, newPassword can't be null");
         }
 
         try {
@@ -284,9 +264,8 @@ public class DataManager {
 
             String response = client.makeRequest("/changePassword", map);
 
-            // Throw exception
             if (response == null) {
-                throw new IllegalStateException("WebClient response is null!");
+                throw new IllegalStateException("Response is null");
             }
 
             JSONParser parser = new JSONParser();
@@ -295,113 +274,18 @@ public class DataManager {
 
             if (status.equals("success")) {
 				currentPassword = newPassword;
-				// org.setPassword(currentPassword);
                 return true;
-            } else if (status.equals("incorrect password")) {
-                throw new IllegalArgumentException("Current password is incorrect!");
+            } else if (status.equals("save error")) {
+                return false;
             } else {
-                throw new IllegalStateException("WebClient responded with an invalid status!");
-            }
-            
-        } catch (IllegalArgumentException e) {
-            throw e;
-        } catch (Exception e) {
-            throw new IllegalStateException("Error while communicating with the server", e);
-        }
-    }
-
-	public boolean editAccountInfo(String id, String newName, String newDescription) {
-
-		// Throw exception
-		if (client == null) {
-			throw new IllegalStateException("Client is null!");
-		}
-		if (id == null) {
-			throw new IllegalArgumentException("ID is null!");
-		}
-		try {
-			Map<String, Object> map = new HashMap<>();
-			map.put("id", id);
-			if (newName != null) {
-				map.put("name", newName);
+				throw new IllegalStateException("WebClient returned error status");
 			}
-			if (newDescription != null) {
-				map.put("description", newDescription);
-			}
-			String response = client.makeRequest("/editAccount", map);
-			// Throw exception
-			if (response == null) {
-				throw new IllegalStateException("WebClient response is null!");
-			}
-
-			JSONParser parser = new JSONParser();
-			JSONObject json = (JSONObject) parser.parse(response);
-			String status = (String) json.get("status");
-			System.out.println(status);
-			if (status.equals("success")) {
-				return true;
-			} else {
-				throw new IllegalStateException("WebClient responded with an invalid status!");
-			}
+		} catch (ParseException e) {
+			throw new IllegalStateException("Failed to parse JSON response");
 		} catch (Exception e) {
-			throw new IllegalStateException("Error while communicating with the server", e);
-		}
-	}
-	// public boolean changePassword(String orgId, String newPassword) {
-	// 	if (orgId == null || newPassword == null) {
-    //         throw new IllegalArgumentException("OrgID/ New Password cannot be null");
-    //     }
-
-    //     try{
-    //        Map<String, Object> map = new HashMap<>(); 
-    //        map.put("id", orgId);
-    //        map.put("password", newPassword);
-    //        String response = client.makeRequest("/changePassword", map);
-
-    //        if (response == null) {
-    //             throw new IllegalStateException("WebClient returned null");
-    //         }
-
-    //         JSONParser parser = new JSONParser();
-    //         JSONObject json = (JSONObject) parser.parse(response);
-    //         String status = (String) json.get("status");
-    //         if ("success".equals(status)) {
-    //             return true;
-    //         } 
-    //         else if ("change failed".equals(status)) {
-    //             return false;
-    //         }
-    //         else {
-    //             throw new IllegalStateException("WebClient returned error status: " + status);
-    //         }
-
-    //     } catch (ParseException e) {
-    //         throw new IllegalStateException("Failed to parse JSON response", e);
-    //     } catch (Exception e) {
-    //         throw new IllegalStateException("Error in communicating with server", e);
-    //     }
-	// }
-
-	// public String updateOrgsPassword(String orgId, String password) {
-	// 	if (orgId == null || password == null) {
-	// 		throw new IllegalArgumentException("OrgID or New Password cannot be null");
-	// 	}
-
-	// 	try {
-	// 		Map<String, Object> map = new HashMap<>();
-	// 		map.put("id", orgId);
-	// 		map.put("password", password);
-	// 		String response = client.makeRequest("/updatePassword", map);
-	// 		JSONParser parser = new JSONParser();
-	// 		JSONObject json = (JSONObject) parser.parse(response);
-	// 		String status = (String) json.get("status");
-
-	// 		return status.equals("success")? "success": "fail";
-	// 	} catch (Exception e) {
-	// 		System.out.println("Error when communicating with server.");
-	// 		return "Error when communicating with server.";
-	// 	}
-	// }
+			throw new IllegalStateException("Error in communicating with server");
+		}	
+    }
 
 
 }

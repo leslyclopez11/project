@@ -29,24 +29,16 @@ public class WebClient {
 				
 			}
 			
-			System.out.println("Web Client request: " + request);
 			
 			@SuppressWarnings("deprecation")
 			URL url = new URL(request);
-			System.out.println("after url");
 		    url.openConnection(); 
-			System.out.println("afterconnection");
 	    	Scanner in = new Scanner(url.openStream());
-			System.out.println("after in");
 	    	String response = "";
 	    	while (in.hasNext()) {
-				//System.out.println("enter in while loop");
 	    		String line = in.nextLine();
-				//System.out.println("line: " + line);
 	    		response += line;
 	    	}
-
-	    	//System.out.println("Web Client response: " + response);
 	    	
 	    	in.close();
 
@@ -55,8 +47,7 @@ public class WebClient {
 			
 		}
 		catch (Exception e) {
-			System.out.println("WHY: " + e);
-			return "pls";
+			return null;
 		}
 		
 	}

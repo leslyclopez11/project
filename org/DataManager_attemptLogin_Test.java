@@ -48,7 +48,7 @@ public class DataManager_attemptLogin_Test {
      }
 
      @Test 
-     public void testLoginthrowException() {
+     public void testException() {
         DataManager dm = new DataManager(new WebClient("localhost", 3001) {
 			
 			@Override
@@ -63,7 +63,7 @@ public class DataManager_attemptLogin_Test {
      }
 
      @Test(expected = IllegalStateException.class)
-	public void testInvalidJsonResponse() {
+	public void testInvalidJSON() {
 		DataManager dm = new DataManager(new WebClient("localhost", 3001) {
 			@Override
 			public String makeRequest(String resource, Map<String, Object> queryParams) {

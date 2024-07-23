@@ -17,7 +17,7 @@ public class DataManager_createFund_Test {
 	 */
 
 	@Test
-	public void testSuccessfulCreation() {
+	public void testSuccessfulFundCreationg() {
 
 		DataManager dm = new DataManager(new WebClient("localhost", 3001) {
 			
@@ -40,7 +40,7 @@ public class DataManager_createFund_Test {
 		
 	}
 	@Test 
-	public void testFailedCreation() {
+	public void testFailedCreationFund() {
 		DataManager dm = new DataManager(new WebClient("localhost", 3001) {
 			
 			@Override
@@ -57,7 +57,7 @@ public class DataManager_createFund_Test {
 	}
 
 	@Test 
-	public void testExceptionThrownDuringRequest() {
+	public void testExceptionDuringRequest() {
 		DataManager dm = new DataManager(new WebClient("localhost", 3001) {
 			
 			@Override
@@ -73,7 +73,7 @@ public class DataManager_createFund_Test {
 	}
 
 	@Test 
-	public void testInvalidJSONResponse() {
+	public void testInvalidJSON() {
 		DataManager dm = new DataManager(new WebClient("localhost", 3001) {
 			
 			@Override

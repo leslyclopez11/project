@@ -10,7 +10,7 @@ import org.junit.Test;
 
 public class DataManager_getContributorName_Test {
      @Test
-    public void testGetContributorNameSuccess() {
+    public void testCNameSuccessful() {
         DataManager dm = new DataManager(new WebClient("localhost", 3001) {
             @Override 
             public String makeRequest(String resource, Map<String, Object> queryParams) {
@@ -23,7 +23,7 @@ public class DataManager_getContributorName_Test {
     }
 
     @Test 
-    public void testGetContributorNameException() {
+    public void testCNameException() {
         DataManager dm = new DataManager(new WebClient("localhost", 3001) {
             @Override 
             public String makeRequest(String resource, Map<String, Object> queryParams) {
@@ -37,7 +37,7 @@ public class DataManager_getContributorName_Test {
     }
 
     @Test 
-    public void testGetContributorNameFail() {
+    public void testCNameUnsuccessful() {
         DataManager dm = new DataManager(new WebClient("localhost", 3001) {
             @Override 
             public String makeRequest(String resource, Map<String, Object> queryParams) {
