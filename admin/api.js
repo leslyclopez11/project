@@ -27,10 +27,33 @@ app.use('/findOrgByLoginAndPassword', (req, res) => {
 		    res.json({ "status" : "success", "data" : result});
 		}
 	    });
-    });
+});
 
 /*
-Create a new fund
+Change Organization's password
+*/
+app.use('/changePassword', (req, res) => {
+    var query = {"_id": req.query.orgId, "password": req.query.currentPassword};
+    Organization.findOne(query, (err, org) => {
+        if (err) {
+            return res.json({"status": "error", "data": err});
+        } else if (!org) {
+            return res.json({"status": "incorrect password"});
+        } else {
+            org.password = req.query.newPassword;
+            org.save((err) => {
+                if (err) {
+                    return res.json({"status": "save error", "data": err});
+                } else {
+                    return res.json({"status": "success", "data": org});
+                }
+            });
+        }
+    });
+});
+
+/*
+Creates a new fund
 */
 app.use('/createFund', (req, res) => {
 
@@ -135,7 +158,7 @@ Return the name of the contributor with ID specified as req.query.id
 app.use('/findContributorNameById', (req, res) => {
     
 	var query = { "_id" : req.query.id };
-	
+	console.log("query: " + query);
 	Contributor.findOne(query, (err, result) => {
 		if (err) {
 		    res.json({'status': 'error', 'data' : err});
@@ -358,6 +381,46 @@ app.use('/allOrgs', (req, res) => {
 	    }).sort({ 'name': 'asc' });
     });
 
+
+
+/*
+Create new organization
+*/
+app.use('/createOrganization', (req, res) => {
+	var organization = new Organization({
+		login: req.query.login,
+		password: req.query.password,
+		name: req.query.name,
+		description: req.query.description,
+		funds: []
+	});
+
+	organization.save((err, newOrganization) => {
+		if (err) {
+			res.json({"status" : "error", "data" : err});
+		} else {
+			res.json({"status" : "success", "data" : newOrganization});
+
+		}
+	});
+}); 
+
+/*
+Finds if a new user wants to use the same username to an existing user
+*/
+
+app.use('/sameUsername', (req, res) => {
+	var query = {"login" : req.query.login};
+	Organization.findOne(query, (err, result) => {
+		if (err) {
+			res.json({"status" : "error", "data" : err});
+		} else if (result) {
+			res.json({"status" : "username already taken"});
+		} else {
+			res.json({"status" : "username available"});
+		}
+	});
+});
 
 
 /********************************************************/
